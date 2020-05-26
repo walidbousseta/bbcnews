@@ -7,8 +7,14 @@
 
 import scrapy
 
-
 class BbcnewsItem(scrapy.Item):
     # define the fields for your item here like:
-    # name = scrapy.Field()
-    pass
+    # image = scrapy.Field()
+    title = scrapy.Field()
+    url = scrapy.Field()
+    summary = scrapy.Field()
+    tags = scrapy.Field()
+    header = scrapy.Field()
+    body = scrapy.Field()
+
+
