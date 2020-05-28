@@ -1,4 +1,5 @@
-#Scraping the BBCNews data
+
+# Scraping the BBCNews data
 A scrapy webscraper that can scrape articles from bbc news website
 
 ## Running the spiders
