@@ -16,5 +16,6 @@ class BbcnewsItem(scrapy.Item):
     tags = scrapy.Field()
     header = scrapy.Field()
     body = scrapy.Field()
+    related = scrapy.Field()
 
 

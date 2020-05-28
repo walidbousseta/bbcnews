@@ -1,18 +1,16 @@
-
+from numpy import unique
 import scrapy
 from ..items import BbcnewsItem
 
 class BBCNews(scrapy.Spider):
 	name = 'bbcnews'
 	start_urls = ['https://www.bbc.com/']
-
-	
-
+	allowed_domains = ['bbc.com']
+	custom_settings = {
+        'DOWNLOAD_TIMEOUT': '200',
+    }
 	def parse(self, response):
-		news = response.xpath('//'+self.get_xpath('media__content'))[:3]
-		# print('---'*45)
-		# print(news)
-		# print('---'*45)
+		news = response.xpath('//'+self.get_xpath('media__content'))
 		for content in news:
 			items = BbcnewsItem()
 
@@ -34,9 +32,12 @@ class BBCNews(scrapy.Spider):
 		body_list = response.xpath('//'+self.get_xpath('story-body__inner')+'//p/text()').extract()
 		body = ' '.join(body_list).strip(' \n')
 
+		related = list(unique(response.xpath('//'+self.get_xpath('tags-container')+'//a/text()').extract()))
+
 		items['header'] = header
 		items['url'] = response.url
 		items['body'] = body
+		items['related'] = related
 		yield items
 
 	def clean(self, txt):
