@@ -5,6 +5,7 @@ after name BBCNews in table news.
 """
 
 from numpy import unique
+import re
 import scrapy
 from ..items import BbcnewsItem
 
@@ -26,9 +27,9 @@ class BBCNews(scrapy.Spider):
 			# items here is to simple upload the data into database
 			items = BbcnewsItem()
 			# here we extrcat the article title and clean it from additionnel whitespaces and new lines
-			items['title'] = self.get_first(content.xpath(self.get_xpath('media__title')+'/a/text()').extract()).strip(' \n')
+			items['title'] = self.clean(self.get_first(content.xpath(self.get_xpath('media__title')+'/a/text()').extract()).strip(' \n'))
 			# we do same for summary as title
-			items['summary'] = self.get_first(content.xpath(self.get_xpath('media__summary')+'/text()').extract()).strip(' \n')
+			items['summary'] = self.clean(self.get_first(content.xpath(self.get_xpath('media__summary')+'/text()').extract()).strip(' \n'))
 			# here we get the tags declare under the article summary 
 			items['tags'] = content.xpath(self.get_xpath('media__tag')+'/text()').extract()
 			# here we get the url to the article so we can scrape it's content
@@ -63,12 +64,16 @@ class BBCNews(scrapy.Spider):
 		datetime = self.get_first(response.xpath('//'+self.get_xpath('mini-info-list__item')+'//@data-datetime').extract())
 
 		# in the end we effect into each item his value and return the data
-		items['header'] = header
+		items['header'] = self.clean(header)
 		items['url'] = response.url
-		items['body'] = body
+		items['body'] = self.clean(body)
 		items['related'] = related
 		items['datetime'] = datetime
 		yield items
+
+	# here we clean the text remove all other characters excpet ., and alphanumeric
+	def clean(self, txt):
+		return re.sub(r'[^A-Za-z0-9., ]', '', txt)
 
 	# here we got the xpath syntax by only changing the class name
 	def get_xpath(self, classname):
