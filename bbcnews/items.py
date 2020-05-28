@@ -7,6 +7,7 @@
 
 import scrapy
 
+# in here we declare the items we need 
 class BbcnewsItem(scrapy.Item):
     # define the fields for your item here like:
     # image = scrapy.Field()
@@ -17,5 +18,6 @@ class BbcnewsItem(scrapy.Item):
     header = scrapy.Field()
     body = scrapy.Field()
     related = scrapy.Field()
+    datetime = scrapy.Field()
 
 
