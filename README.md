@@ -1,7 +1,8 @@
 
+# Scraping the BBCNews data
 A scrapy webscraper that can scrape articles from bbc news website
 
-# Running the spiders
+## Running the spiders
 To create a scrapy project:
 ```
 scrapy startproject bbcnews
@@ -9,7 +10,18 @@ scrapy startproject bbcnews
 
 Start scrapping
 ```
-scrapy crawl bbc
+scrapy crawl bbcnews
 ```
 
-# The structure of bbcNews spider
+## The structure of bbcNews return
+I scrape for each news article the following data:
+```
+    title = the article title
+    url = url into tthe article content
+    summary = the summary showing in the first page
+    tags = tags show in the first page 
+    header = in the article page we extract the header 
+    body = the article body news
+    related = related topics to the article
+    datetime = when the article published
+```
