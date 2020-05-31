@@ -4,12 +4,17 @@ from tkinter.scrolledtext import ScrolledText
 from tkinter import messagebox
 from pymongo import MongoClient
 from time import sleep
+import webbrowser
+from tkHyperlinkManager import HyperlinkManager
+from toolTip import *
+from functools import partial
 
 class Window(Frame):
 	def __init__(self, master=None):
 		Frame.__init__(self, master)
 		self.master = master
 		self.init_window()
+		messagebox.showwarning("Info", "Select Database --> Select Table --> Click any Item To display tool panel :).") 
 
 	def init_window(self):
 		self.master.title('MongoDB API')
@@ -85,7 +90,6 @@ class Window(Frame):
 			self.ctree.grid(row=0, column=1, padx=5, pady=5)
 			self.ctree.bind('<Double-1>', selectItem)
 			self.ctree.bind('<ButtonRelease-1>', self._actions)
-
 			# Constructing vertical scrollbar 
 			# with treeview 
 			verscrlbar = ttk.Scrollbar(frame, orient ="vertical", command = self.ctree.yview)
@@ -236,6 +240,24 @@ class Window(Frame):
 			scrollT = ScrolledText(win)
 			scrollT.grid(row=1, column=0, columnspan=2, padx=4, pady=4)
 
+		def _info():
+			win = Toplevel(width=500, height=550)
+			win.resizable(width=False, height=False)
+			win.wm_title('Search')
+			win.grid_propagate(False)
+			win.grid_columnconfigure(0, weight=1)
+			win.grid_rowconfigure(0, weight=1)
+
+			text = Text(win, width=300, height=250, wrap=WORD)
+			text.grid(pady=4, padx=4)
+			text.insert(END, 'hello here instructions of using the app: \n\n\nSHOW ITEM : double clic on it \n\n\nDELETE ITEM : select item you want to delete then hit the delete button \n\n\nINSERT ITEM : click the Insert button entre the information and click Confirm button to insert (hit the table agin to see the updated collection) \n\n\nUPDATE ITEM : select the item you want to update then hit the update button, Confirm to send the update \n\n\n\nthanks have a good day for more information about me please check my Portfilio in ')
+			hyperlink = HyperlinkManager(text)
+			text.insert(INSERT, "https://www.bousseta.ml",
+			            hyperlink.add(partial(webbrowser.open, "https://www.bousseta.ml/")))
+			text.insert(INSERT, "\n\n And here's my LinkedIn profile : \n")
+			text.insert(INSERT, "https://www.linkedin.com/in/walid-bousseta/",
+			            hyperlink.add(partial(webbrowser.open, "https://www.linkedin.com/in/walid-bousseta/")))
+
 
 		fframe = Frame(self.master, width=200, height=80, bg='#33FF7D')
 		fframe.grid(row=2, column=0, columnspan=2, sticky='wens', padx=4, pady=4)
@@ -244,33 +266,39 @@ class Window(Frame):
 		fframe.grid_rowconfigure(0, weight=1)
 
 		h_img = PhotoImage(file="./images/info.png")
-		help_btn = Button(fframe, width=140, height=70, text='HELP', image=h_img)
+		help_btn = Button(fframe, width=140, height=70, text='INFO',
+						 image=h_img, command=_info)
 		help_btn.image=h_img
 		help_btn.grid(row=0, column=0, padx=4, pady=4)
+		CreateToolTip(help_btn, text='Help')
 
 		i_img = PhotoImage(file="./images/insert.png")
 		insert_btn = Button(fframe, width=140, height=70, text='INSERT', 
 							image=i_img, command=_insert_item)
 		insert_btn.image = i_img
 		insert_btn.grid(row=0, column=1, padx=4, pady=4)
+		CreateToolTip(insert_btn, text='Insert new Item')
 
 		u_img = PhotoImage(file="./images/update.png")
 		update_btn = Button(fframe, width=140, height=70, text='UPDATE', 
 							image=u_img, command=_update_item)
 		update_btn.image=u_img
 		update_btn.grid(row=0, column=2, padx=4, pady=4)
+		CreateToolTip(update_btn, text='Update an Item')
 
 		d_img = PhotoImage(file="./images/delete.png")
 		delete_btn = Button(fframe, width=140, height=70, text='DELETE', 
 							image=d_img, command=_remove_item)
 		delete_btn.image = d_img
 		delete_btn.grid(row=0, column=3, padx=4, pady=4)
+		CreateToolTip(delete_btn, text='Delete a selection')
 
 		f_img = PhotoImage(file="./images/find.png")
 		find_btn = Button(fframe, width=140, height=70, text='FIND', 
 						image=f_img, command=_find)
 		find_btn.image=f_img
-		find_btn.grid(row=0, column=4, padx=4, pady=4)	
+		find_btn.grid(row=0, column=4, padx=4, pady=4)
+		CreateToolTip(find_btn, text='Find')	
 
 
 root = Tk()
