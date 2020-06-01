@@ -9,40 +9,56 @@ from tkHyperlinkManager import HyperlinkManager
 from toolTip import *
 from functools import partial
 
+# the main class
 class Window(Frame):
+	# create the master root
 	def __init__(self, master=None):
 		Frame.__init__(self, master)
 		self.master = master
+		# initials the root
 		self.init_window()
+		# alter an info message
 		messagebox.showwarning("Info", "Select Database --> Select Table --> Click any Item To display tool panel :).") 
 
 	def init_window(self):
+		# title of the frame
 		self.master.title('MongoDB API')
+		# dimentions
 		self.master.geometry('810x500')
 		# self.master.resizable(width=False, height=False)
+		# to connect to database and start other part of GUI
 		self._connect()
 
 	def _connect(self):
+		# create a MongoDb client to have access into it's content
 		self.client = MongoClient('localhost', 27017)
 	
+		# databases list
 		frame = Frame(self.master, width=150, height=200, bg='#aaaaff')
 		frame.grid(row=0, column=0, sticky='w', padx=4, pady=4)
 		frame.grid_propagate(False)
 
+		# get all databases names in the mongo db and print them out in list
 		Label(frame, text='DataBases', font=('Coureil', 13)).pack(padx=5, pady=5)
 		self.dbs_list = Listbox(frame, height=9, width=20)
 		self.dbs_list.pack(padx=5, pady=5)
+		# add an event to show table list buy selected database name
 		self.dbs_list.bind('<<ListboxSelect>>', self._tables)
 		for db in self.client.list_database_names():
 			self.dbs_list.insert(END, db)
 		
+	# collenctions 
 	def _tables(self, evt):
+		# get the selected database name
 		w = evt.widget
 		index = w.curselection()
+		# print all collections i database
 		if len(index)>0:
 			value = w.get(int(index[0]))
+			# by database name = connect to it
 			self.db = self.client[value]
 
+			# frame to list all collections in the database
 			frame = Frame(self.master, width=150, height=200, bg='#FF5733')
 			frame.grid(row=1, column=0, sticky='w', padx=4, pady=4)
 			frame.grid_propagate(False)
@@ -50,12 +66,14 @@ class Window(Frame):
 			self.cols_list = Listbox(frame, height=9, width=20)
 			self.cols_list.pack(padx=5, pady=5)
 			self.cols_list.bind('<<ListboxSelect>>', self._content)
+			# here loop on collections names
 			for col in self.db.list_collection_names():
 				self.cols_list.insert(END, col)
 			
-	
+	# to print the content of the collection
 	def _content(self, var):
 		self.selected_col_event = var
+		# to show a popup frame with elements of the selected item in the collection
 		def selectItem(a):
 			curItm = self.ctree.focus()
 			win = Toplevel(width=300, height=400)
@@ -69,16 +87,21 @@ class Window(Frame):
 			textFrame.insert(INSERT, text)
 
 		wid = var.widget
+		# to print out all items in the collection
 		if len(wid.curselection())>0:
 			col_v = wid.get(int(wid.curselection()[0]))
+			# connect to collection
 			self.col = self.db[col_v]
+			# get all items in the collection
 			all_items = list(self.col.find())
 			frame = Frame(self.master, width=650, height=200)
 			frame.grid(row=0, column=1, rowspan=2, sticky='wens', padx=4, pady=4)
 			frame.grid_propagate(False)
 			
+			# get keys of the collection (get the header)
 			keys = tuple(k for k in self.col.find_one())
 
+			# put all items in list
 			style = ttk.Style()
 			style.configure("mystyle.Treeview.Heading", font=('Calibri', 13,'bold')) # Modify the font of the headings
 			self.ctree = ttk.Treeview(frame, height=17, style="mystyle.Treeview")
@@ -100,6 +123,7 @@ class Window(Frame):
 
 			self.ctree.configure(yscrollcommand = verscrlbar.set, xscrollcommand = horscrlbar.set)
 
+			# put items to list
 			for i, it in enumerate(all_items):
 				bcolor = ('odd',) if i%2!=0 else ('even',)
 				self.ctree.insert("", 'end', text =str(i), values=tuple(it.values()), tags=bcolor)
@@ -107,6 +131,7 @@ class Window(Frame):
 			self.ctree.tag_configure('odd', background='red')
 			self.ctree.tag_configure('even', background='blue')
 	
+	# to update or insert an item this function is for diynamic frame creation based on the collection content and keys
 	def _dataFrame(self, keys, data=None):
 		def _confirm():
 			res = {}
@@ -116,8 +141,10 @@ class Window(Frame):
 					res[k] = entry.get('1.0', END)
 				else:
 					res[k] = entry.get()
+			# when tha data is none so we are in insert
 			if title=='insert':
 				try:
+					# insert item into collection
 					self.col.insert_one(res)
 				except Exception as e:
 					if hasattr(e, 'message'):
@@ -127,6 +154,7 @@ class Window(Frame):
 					messagebox.showerror("Error", msg)
 			else:
 				try:
+					# updtae the item by id
 					self.col.update_one({'_id':data[keys.index('_id')]} , {"$set":res})
 				except Exception as e:
 					if hasattr(e, 'message'):
