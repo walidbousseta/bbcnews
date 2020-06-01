@@ -1,6 +1,9 @@
 
 # Scraping the BBCNews data
 A scrapy webscraper that can scrape articles from bbc news website
+```
+make sure that all packages in requirements.txt are installed
+```
 
 ## Running the spiders
 To create a scrapy project:
@@ -25,3 +28,10 @@ I scrape for each news article the following data:
     related = related topics to the article
     datetime = when the article published
 ```
+
+## to start the DB_API
+```
+    $-> python main.py
+```
+
+<img src=DB_API/images/app.png>
