@@ -12,6 +12,7 @@ class BBCNews(object):
 		self.collection = self.db.News
 
 	def print_all(self):
+		# here we print all docs exist:
 		print('print all docs :')
 		for doc in self.collection.find():
 			print(doc)
